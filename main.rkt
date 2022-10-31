@@ -1,7 +1,7 @@
 #lang racket
 
 (require net/http-easy
-         (for-syntax syntax/parse racket/base)
+         (for-syntax syntax/parse racket/base racket/syntax)
          syntax/parse
          racket/syntax)
 
@@ -56,7 +56,10 @@
 (define-syntax (define-torrent-rpc-method stx)
   (syntax-parse stx
     [(_ name:id (arg*:argument ...))
-     #`(define-rpc-method #,(datum->syntax this-syntax (string->symbol (string-append "torrent-" (symbol->string (syntax-e #'name))))) ([ids 'omit] (~@ arg* ...)))]
+     (with-syntax ([torrent-name (format-id this-syntax "torrent-~a" (syntax-e #'name))])
+       #'(define-rpc-method torrent-name
+           ([ids 'omit]
+            (~@ arg* ...))))]
     [(_ name:id)
      #'(define-torrent-rpc-method name ())]))
 
