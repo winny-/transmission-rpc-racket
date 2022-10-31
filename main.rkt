@@ -105,3 +105,8 @@
 (define-torrent-rpc-method remove ([delete-local-data 'omit]))
 (define-torrent-rpc-method set-location (location [move 'omit]))
 (define-torrent-rpc-method rename-path (path name))
+
+(module+ test
+  (require rackunit)
+  ;; torrent-verify: unbound identifier
+  (test-pred "torrent-verify exists" procedure? torrent-verify))
