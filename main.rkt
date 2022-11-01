@@ -56,12 +56,12 @@
 (define-syntax (define-torrent-rpc-method stx)
   (syntax-parse stx
     [(_ name:id (arg*:argument ...))
-     (with-syntax ([torrent-name (format-id this-syntax "torrent-~a" (syntax-e #'name))])
-       #'(define-rpc-method torrent-name
-           ([ids 'omit]
-            (~@ arg* ...))))]
+     #:with torrent-name (format-id this-syntax "torrent-~a" #'name)
+     #'(define-rpc-method torrent-name
+         ([ids 'omit]
+          (~@ arg* ...)))]
     [(_ name:id)
-     #'(define-torrent-rpc-method name ())]))
+     (datum->syntax stx (list #'define-torrent-rpc-method #'name #'()))]))
 
 (define-rpc-method session-get)
 (define-rpc-method session-stats)
