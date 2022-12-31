@@ -27,14 +27,20 @@
     [(response #:json (hash-table pats ...))
      (raise-user-error "Got weird json response " pats)]))
 
+
 (begin-for-syntax
+  (define (identifier->keyword-syntax stx id)
+    (datum->syntax stx (string->keyword (symbol->string (syntax-e id)))))
   (define-syntax-class argument
     (pattern name:id
-             #:attr kwarg (datum->syntax this-syntax (string->keyword (symbol->string (syntax-e #'name))))
+             #:attr kwarg (identifier->keyword-syntax this-syntax #'name)
              #:attr binding #'name)
     (pattern [name:id default:expr]
-             #:attr kwarg (datum->syntax this-syntax (string->keyword (symbol->string (syntax-e #'name))))
-             #:attr binding #'[name default])))
+             #:attr kwarg (identifier->keyword-syntax this-syntax #'name)
+             #:attr binding #'[name default])
+    (pattern [name:id]
+             #:attr kwarg (identifier->keyword-syntax this-syntax #'name)
+             #:attr binding #'[name 'omit])))
 (define-syntax (define-rpc-method stx)
   (syntax-parse stx
     [(_ name:id)
@@ -76,34 +82,34 @@
 (define-torrent-rpc-method reannounce)
 
 (define-torrent-rpc-method get (fields
-                                [format 'omit]))
-(define-torrent-rpc-method set ([bandwidthPriority 'omit]
-                                [downloadLimit 'omit]
-                                [downloadLimited 'omit]
-                                [files-unwanted 'omit]
-                                [files-wanted 'omit]
-                                [group 'omit]
-                                [honorsSessionLimits 'omit]
-                                [labels 'omit]
-                                [location 'omit]
-                                [peer-limit 'omit]
-                                [priority-high 'omit]
-                                [priority-low 'omit]
-                                [priority-normal 'omit]
-                                [queuePosition 'omit]
-                                [seedIdleLimit 'omit]
-                                [seedIdleMode 'omit]
-                                [seedRatioLimit 'omit]
-                                [seedRatioMode 'omit]
-                                [trackerAdd 'omit]
-                                [trackerList 'omit]
-                                [trackerRemove 'omit]
-                                [trackerReplace 'omit]
-                                [uploadLimit 'omit]
-                                [uploadLimited 'omit]))
+                                [format]))
+(define-torrent-rpc-method set ([bandwidthPriority]
+                                [downloadLimit]
+                                [downloadLimited]
+                                [files-unwanted]
+                                [files-wanted]
+                                [group]
+                                [honorsSessionLimits]
+                                [labels]
+                                [location]
+                                [peer-limit]
+                                [priority-high]
+                                [priority-low]
+                                [priority-normal]
+                                [queuePosition]
+                                [seedIdleLimit]
+                                [seedIdleMode]
+                                [seedRatioLimit]
+                                [seedRatioMode]
+                                [trackerAdd]
+                                [trackerList]
+                                [trackerRemove]
+                                [trackerReplace]
+                                [uploadLimit]
+                                [uploadLimited]))
 
-(define-torrent-rpc-method remove ([delete-local-data 'omit]))
-(define-torrent-rpc-method set-location (location [move 'omit]))
+(define-torrent-rpc-method remove ([delete-local-data]))
+(define-torrent-rpc-method set-location (location [move]))
 (define-torrent-rpc-method rename-path (path name))
 
 (module+ test
